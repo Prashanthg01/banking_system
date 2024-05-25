@@ -24,8 +24,8 @@ def login():
             access_token = response.json['access_token']
             refresh_token = response.json['refresh_token']
             resp = make_response(redirect(url_for('auth.dashboard')))
-            resp.set_cookie('access_token', access_token, httponly=True)
-            resp.set_cookie('refresh_token', refresh_token, httponly=True)
+            resp.set_cookie('access_token_cookie', access_token, httponly=True)
+            resp.set_cookie('refresh_token_cookie', refresh_token, httponly=True)
             return resp
         else:
             return render_template('login.html', error=response.json['msg'])
@@ -42,7 +42,12 @@ def logout():
 @jwt_required()
 def dashboard():
     current_user = get_jwt_identity()
-    return render_template('dashboard.html', user_id=current_user)
+    access_token_cookie = request.cookies.get('access_token_cookie')
+    if access_token_cookie:
+        return render_template('dashboard.html', user_id=current_user)
+    else:
+        return jsonify({"msg": "Missing access token cookie"}), 401
+
 
 @auth_bp.route('/token/refresh', methods=['POST'])
 def refresh():

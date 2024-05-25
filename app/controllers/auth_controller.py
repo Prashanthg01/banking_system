@@ -32,8 +32,6 @@ def login_user(data):
     if user and bcrypt.check_password_hash(user['password'], data['password']):
         access_token = create_access_token(identity=data['user_id'])
         refresh_token = create_refresh_token(identity=user['user_id'])
-        response = jsonify(access_token=access_token)
-        set_access_cookies(response, access_token)
         return jsonify({
             'access_token': access_token,
             'refresh_token': refresh_token
