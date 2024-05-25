@@ -4,62 +4,54 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard</title>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const logoutForm = document.querySelector('form');
-            logoutForm.addEventListener('submit', function (event) {
-                event.preventDefault();
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', '/auth/logout');
-                xhr.setRequestHeader('Content-Type', 'application/json');
-
-                const cookies = document.cookie.split('; ');
-                let accessToken = '';
-                cookies.forEach(cookie => {
-                    if (cookie.startsWith('access_token=')) {
-                        accessToken = cookie.split('=')[1];
-                    }
-                });
-
-                if (accessToken) {
-                    xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
-                }
-
-                xhr.onload = function () {
-                    if (xhr.status === 200) {
-                        window.location.href = '/auth/login';
-                    } else {
-                        alert('Logout failed');
-                    }
-                };
-                xhr.send();
-            });
-
-            function refreshAccessToken() {
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', '/auth/token/refresh');
-                xhr.setRequestHeader('Content-Type', 'application/json');
-                xhr.onload = function () {
-                    if (xhr.status === 200) {
-                        const response = JSON.parse(xhr.responseText);
-                        document.cookie = `access_token=${response.access_token}; path=/; httponly`;
-                    } else {
-                        window.location.href = '/auth/login';
-                    }
-                };
-                xhr.send();
-            }
-
-            setInterval(refreshAccessToken, 15 * 60 * 1000); // Refresh token every 15 minutes
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 </head>
 
 <body>
+    {% if deposit_requests %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Account Number</th>
+                <th>Amount</th>
+                <th>IFSC Code</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in deposit_requests %}
+            <tr>
+                <td>{{ request.name }}</td>
+                <td>{{ request.account_number }}</td>
+                <td>{{ request.amount }}</td>
+                <td>{{ request.ifsc_code }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('banker.update_status', request_account_num=request.account_number) }}">
+                        <select name="status">
+                            <option value="pending" {% if request.status=='pending' %}selected{% endif %}>Pending</option>
+                            <option value="accepted" {% if request.status=='accepted' %}selected{% endif %}>Accepted</option>
+                            <option value="declined" {% if request.status=='declined' %}selected{% endif %}>Declined</option>
+                        </select>
+                        <button type="submit">Save</button>
+                    </form>
+                    
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No deposit requests found.</p>
+    {% endif %}
+
     <h1>Welcome to your Banker Dashboard, {{ user_id }}</h1>
-    <form>
+    <form action="/auth/logout" method="post">
         <button type="submit">Logout</button>
     </form>
+    
+
 </body>
 
 </html>
