@@ -8,12 +8,18 @@ def register_user(data):
     if not data.get('account_num') or not data.get('user_id') or not data.get('password'):
         return jsonify({"msg": "Missing required fields"}), 400
 
+    # Check if account_num exists in accounts collection
+    account = mongo.db.accounts.find_one({"account_number": data['account_num']})
+    if not account:
+        return jsonify({"msg": "Account number does not exist"}), 400
+
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
 
     user = User(
         account_num=data['account_num'],
         user_id=data['user_id'],
-        password=hashed_password
+        password=hashed_password,
+        role=data.get('role', 'customer')
     )
 
     try:
@@ -34,7 +40,8 @@ def login_user(data):
         refresh_token = create_refresh_token(identity=user['user_id'])
         return jsonify({
             'access_token': access_token,
-            'refresh_token': refresh_token
+            'refresh_token': refresh_token,
+            'role': user['role']
         }), 200
     else:
         return jsonify({"msg": "Invalid user ID or password"}), 401

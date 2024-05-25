@@ -1,12 +1,14 @@
 class User:
-    def __init__(self, account_num, user_id, password):
+    def __init__(self, account_num, user_id, password, role="customer"):
         self.account_num = account_num
         self.user_id = user_id
         self.password = password
+        self.role = role
 
     def to_dict(self):
         return {
             "account_num": self.account_num,
             "user_id": self.user_id,
-            "password": self.password
+            "password": self.password,
+            "role": self.role
         }

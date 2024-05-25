@@ -6,6 +6,9 @@ def register_account(data):
     for field in required_fields:
         if field not in data:
             return jsonify({"msg": f"Missing {field}"}), 400
-    
+
+    if 'balance' not in data:
+        data['balance'] = 0
+        
     Account.create_account(data)
     return jsonify({"msg": "Account successfully registered"}), 201

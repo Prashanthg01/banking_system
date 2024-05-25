@@ -23,7 +23,9 @@ def login():
         if status == 200:
             access_token = response.json['access_token']
             refresh_token = response.json['refresh_token']
-            resp = make_response(redirect(url_for('auth.dashboard')))
+            role = response.json['role']
+            
+            resp = make_response(redirect(url_for('customer.customer_dashboard') if role == 'customer' else url_for('banker.banker_dashboard')))
             resp.set_cookie('access_token_cookie', access_token, httponly=True)
             resp.set_cookie('refresh_token_cookie', refresh_token, httponly=True)
             return resp
@@ -37,17 +39,6 @@ def logout():
     response = jsonify({"msg": "Logout successful"})
     unset_jwt_cookies(response)
     return response, 200
-
-@auth_bp.route('/dashboard')
-@jwt_required()
-def dashboard():
-    current_user = get_jwt_identity()
-    access_token_cookie = request.cookies.get('access_token_cookie')
-    if access_token_cookie:
-        return render_template('dashboard.html', user_id=current_user)
-    else:
-        return jsonify({"msg": "Missing access token cookie"}), 401
-
 
 @auth_bp.route('/token/refresh', methods=['POST'])
 def refresh():

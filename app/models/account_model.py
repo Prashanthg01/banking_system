@@ -1,6 +1,4 @@
-from flask_pymongo import PyMongo
-
-mongo = PyMongo()
+from app import mongo
 
 class Account:
     @staticmethod
