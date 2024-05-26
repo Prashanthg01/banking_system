@@ -2,7 +2,7 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_pymongo import PyMongo
 from flask_bcrypt import Bcrypt
-from app.utils.error_handlers import register_error_handlers
+from .utils.error_handlers import error_handlers_bp
 
 mongo = PyMongo()
 bcrypt = Bcrypt()
@@ -26,8 +26,6 @@ def create_app():
         app.register_blueprint(banker_bp, url_prefix='/banker')
         app.register_blueprint(customer_bp, url_prefix='/customer')
         app.register_blueprint(transaction_bp, url_prefix='/transactions')
-
-        # Register error handlers
-        register_error_handlers(app)
+        app.register_blueprint(error_handlers_bp)
 
     return app

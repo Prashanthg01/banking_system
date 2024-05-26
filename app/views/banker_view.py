@@ -4,6 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models.transaction_model import DepositForm, withdrawForm
 from app.models.account_model import Account
 from app import mongo
+from app.controllers import banker_controller
 
 banker_bp = Blueprint('banker', __name__)
 
@@ -22,20 +23,17 @@ def register_account_view():
 @banker_bp.route('/edit_account/<account_number>', methods=['GET', 'POST'])
 @jwt_required()
 def edit_account(account_number):
-    account = Account.get_account_by_number(account_number)
+    if request.method == 'POST':
+        data = request.form.to_dict()
+        response, status = banker_controller.update_account_details(account_number, data)
+        if status == 200:
+            return redirect(url_for('banker.banker_dashboard'))
+        else:
+            return jsonify(response), status
+
+    account = banker_controller.get_account_by_number(account_number)
     if not account:
         return jsonify({"msg": "Account not found"}), 404
-
-    if request.method == 'POST':
-        # Update account details
-        account['name'] = request.form['name']
-        account['phone_number'] = request.form['phone_number']
-        account['address'] = request.form['address']
-        account['ifsc_code'] = request.form['ifsc_code']
-        account['balance'] = float(request.form['balance'])  # Ensure balance is a float
-
-        Account.update_account(account)
-        return redirect(url_for('banker.banker_dashboard'))
 
     return render_template('banker/edit_account.html', account=account)
 
