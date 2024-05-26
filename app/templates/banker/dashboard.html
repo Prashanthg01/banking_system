@@ -30,7 +30,7 @@
                 <td>{{ request.ifsc_code }}</td>
                 <td>
                     <form method="POST"
-                        action="{{ url_for('banker.update_status', request_account_num=request.account_number) }}">
+                        action="{{ url_for('banker.update_status', request_account_num=request.account_number, request_amount=request.amount) }}">
                         <select name="status">
                             <option value="pending" {% if request.status=='pending' %}selected{% endif %}>Pending
                             </option>

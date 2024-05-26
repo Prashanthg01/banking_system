@@ -57,26 +57,33 @@ def banker_dashboard():
     if access_token_cookie:
         all_accounts = Account.get_all_accounts()
         deposit_requests = DepositForm.get_all_deposit_requests()
-        print(all_accounts)
         return render_template('banker/dashboard.html', user_id=current_user, deposit_requests=deposit_requests, all_accounts=all_accounts)
     else:
         return jsonify({"msg": "Missing access token cookie"}), 401
     
-@banker_bp.route('/update_status/<request_account_num>', methods=['POST'])
+@banker_bp.route('/update_status/<request_account_num>/<request_amount>', methods=['POST'])
 @jwt_required()
-def update_status(request_account_num):
+def update_status(request_account_num, request_amount):
     # Get the new status from the form data
     new_status = request.form.get('status')
-    print("request_id", request_account_num)
-    print("new_status", new_status)
-
+    
     # Update the status of the deposit request in the database
     result = mongo.db.deposit_forms.update_one(
         {"account_number": request_account_num},
         {"$set": {"status": new_status}}
     )
 
-    if result.modified_count > 0:
-        return jsonify({"msg": "Status updated successfully"}), 200
+    if result.matched_count > 0 and result.modified_count > 0:
+        # If the status is accepted, update the account balance
+        if new_status == "accepted":
+            account = Account.get_account_by_number(request_account_num)
+            if account:
+                new_balance = account.get('balance', 0) + float(request_amount)
+                Account.update_account({"account_number": request_account_num, "balance": new_balance})
+                return jsonify({"msg": "Status updated and balance adjusted successfully"}), 200
+            else:
+                return jsonify({"msg": "Account not found"}), 404
+        else:
+            return jsonify({"msg": "Status updated successfully"}), 200
     else:
         return jsonify({"msg": "Deposit request not found"}), 404
