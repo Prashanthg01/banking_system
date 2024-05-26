@@ -55,10 +55,15 @@ def banker_dashboard():
     current_user = get_jwt_identity()
     access_token_cookie = request.cookies.get('access_token_cookie')
     
+    deposit_requests = DepositForm.get_all_deposit_requests()
+    withdraw_requests = withdrawForm.get_all_withdraw_requests()
+    deposit_and_withdraw_history = deposit_requests + withdraw_requests if withdraw_requests else deposit_requests
+    deposit_and_withdraw_history.sort(key=lambda x: (x['date'], x['time']))
+    
     if access_token_cookie:
         all_accounts = Account.get_all_accounts()
         deposit_requests = DepositForm.get_all_deposit_requests()
         withdraw_requests = withdrawForm.get_all_withdraw_requests()
-        return render_template('banker/dashboard.html', user_id=current_user, deposit_requests=deposit_requests, all_accounts=all_accounts, withdraw_requests=withdraw_requests)
+        return render_template('banker/dashboard.html', user_id=current_user, deposit_requests=deposit_requests, all_accounts=all_accounts, withdraw_requests=withdraw_requests, deposit_and_withdraw_history=deposit_and_withdraw_history)
     else:
         return jsonify({"msg": "Missing access token cookie"}), 401

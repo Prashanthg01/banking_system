@@ -42,3 +42,9 @@
   border-radius: 10px;
   color: #fff;
 }
+
+.transactions_history {
+  height: 70vh;
+  overflow: scroll;
+  width: fit-content;
+}
