@@ -37,7 +37,7 @@
                 <td>{{ request.ifsc_code }}</td>
                 <td>
                     <form method="POST"
-                        action="{{ url_for('banker.update_deposit_status', form_id=request.form_id, request_amount=request.amount) }}">
+                        action="{{ url_for('transactions.update_deposit_status', form_id=request.form_id, request_amount=request.amount) }}">
                         <select name="status">
                             <option value="pending" {% if request.status=='pending' %}selected{% endif %}>Pending
                             </option>
@@ -81,7 +81,7 @@
                 <td>{{ request.ifsc_code }}</td>
                 <td>
                     <form method="POST"
-                        action="{{ url_for('banker.update_withdraw_status', form_id=request.form_id, request_amount=request.amount) }}">
+                        action="{{ url_for('transactions.update_withdraw_status', form_id=request.form_id, request_amount=request.amount) }}">
                         <select name="status">
                             <option value="pending" {% if request.status=='pending' %}selected{% endif %}>Pending
                             </option>
@@ -139,6 +139,25 @@
         </table>
     </div>    
 
+    <h1>Balance checks History</h1>
+    <table border="1">
+        <thead>
+          <tr>
+            <th>Account Number</th>
+            <th>Name</th>
+            <th>Balance Checks</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for account in all_accounts %}
+          <tr>
+            <td>{{ account.account_number }}</td>
+            <td>{{ account.name }}</td>
+            <td>{{ account.balance_checks }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
 </body>
 
 </html>

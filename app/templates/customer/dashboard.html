@@ -10,8 +10,9 @@
 
 <body>
     <h1>Welcome to your Customer Dashboard, {{ user_id }}</h1>
-    <li><a href="{{ url_for('customer.deposit') }}">Deposit Request Form</a></li>
-    <li><a href="{{ url_for('customer.withdraw') }}">Withdraw Request Form</a></li>
+    <li><a href="{{ url_for('transactions.deposit') }}">Deposit Request Form</a></li>
+    <li><a href="{{ url_for('transactions.withdraw') }}">Withdraw Request Form</a></li>
+    <li><a href="{{ url_for('customer.check_balance') }}">Check Balance</a></li>
     <form action="/auth/logout" method="post">
         <button type="submit">Logout</button>
     </form>
@@ -25,7 +26,6 @@
             <p>Gender: {{ current_user_account_details.gender }}</p>
             <p>Account Number: {{ current_user_account_details.account_number }}</p>
             <p>IFSC Code: {{ current_user_account_details.ifsc_code }}</p>
-            <p>Balance: {{ current_user_account_details.balance }}</p>
         {% else %}
             <p>No account details found</p>
         {% endif %}
@@ -38,6 +38,7 @@
         {% else %}
         {% for request in deposit_requests %}
         <div {% if request.form_type == "deposit" %} class="deposite_cards" {% else %} class="withdraw_cards" {% endif %}>
+            <p>Transaction ID: {{ request.form_id }}</p>
             <p>Account number: {{ request.account_number }}</p>
             <p>Amount: {{ request.amount }}</p>
             <p>{{ request.form_type }}: <span {% if request.status in ['accepted', 'success'] %} class="success" {% elif request.status == 'declined' %} class="decline" {% else %} class="pending" {% endif %}>{{ request.status }}</span></p>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Check Balance</title>
+</head>
+<body>
+    {% if action == "create" %}
+    <h1>Create UPI ID Check Balance</h1>
+        <form method="POST" action="{{ url_for('customer.check_balance') }}">
+            <label for="new_upi_id">Enter new 6-digit UPI ID:</label>
+            <input type="text" id="new_upi_id" name="new_upi_id" maxlength="6" required>
+            <br>
+            <label for="reenter_upi_id">Re-enter UPI ID:</label>
+            <input type="text" id="reenter_upi_id" name="reenter_upi_id" maxlength="6" required>
+            <button type="submit">Create UPI ID</button>
+        </form>
+    {% else %}
+    <h1>Check Balance</h1>
+        <form method="POST" action="{{ url_for('customer.check_balance') }}">
+            <label for="upi_id">Enter 6-digit UPI ID:</label>
+            <input type="text" id="upi_id" name="upi_id" maxlength="6" required>
+            <button type="submit">Check Balance</button>
+        </form>
+    {% endif %}
+</body>
+</html>

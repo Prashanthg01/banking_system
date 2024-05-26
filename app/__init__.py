@@ -21,9 +21,11 @@ def create_app():
         from app.views.auth_view import auth_bp
         from app.views.banker_view import banker_bp
         from app.views.customer_view import customer_bp
+        from app.views.transaction_view import transaction_bp
         app.register_blueprint(auth_bp, url_prefix='/auth')
         app.register_blueprint(banker_bp, url_prefix='/banker')
         app.register_blueprint(customer_bp, url_prefix='/customer')
+        app.register_blueprint(transaction_bp, url_prefix='/transactions')
 
         # Register error handlers
         register_error_handlers(app)

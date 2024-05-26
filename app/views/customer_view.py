@@ -1,8 +1,9 @@
-from flask import request, jsonify, render_template, Blueprint
+from flask import request, jsonify, render_template, Blueprint, redirect, url_for
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.controllers.customer_controller import deposit_amount, withdraw_amount
-from app.models.account_model import DepositForm, Account, withdrawForm
+from app.models.account_model import Account
+from app.models.transaction_model import withdrawForm, DepositForm
 from app.models.user_model import User
+from werkzeug.security import generate_password_hash, check_password_hash
 
 customer_bp = Blueprint('customer', __name__)
 
@@ -27,38 +28,37 @@ def customer_dashboard():
     else:
         return jsonify({"msg": "Missing access token cookie"}), 401
 
-@customer_bp.route('/deposit', methods=['GET', 'POST'])
+@customer_bp.route('/check_balance', methods=['GET', 'POST'])
 @jwt_required()
-def deposit():
-    if request.method == 'POST':
-        data = request.form.to_dict()
-        response, status = deposit_amount(data)
-        if status == 200:
-            return jsonify({"msg": "Deposit successful"}), 200
-        else:
-            return jsonify({"msg": response.json['msg']}), status
-        
+def check_balance():
     current_user = get_jwt_identity()
-    deposit_requests = DepositForm.get_deposit_requests_by_user(current_user)
-    if deposit_requests:
-        return render_template('customer/deposit.html', deposit_requests=deposit_requests, form_type="deposit")
-    else:
-        return render_template('customer/deposit.html', msg="No deposit requests found", form_type="deposit")
+    account = Account.get_account_by_user(current_user)
     
-@customer_bp.route('/withdraw', methods=['GET', 'POST'])
-@jwt_required()
-def withdraw():
     if request.method == 'POST':
-        data = request.form.to_dict()
-        response, status = withdraw_amount(data)
-        if status == 200:
-            return jsonify({"msg": "withdraw successful"}), 200
-        else:
-            return jsonify({"msg": response.json['msg']}), status
-        
-    current_user = get_jwt_identity()
-    withdraw_requests = withdrawForm.get_withdraw_requests_by_user(current_user)
-    if withdraw_requests:
-        return render_template('customer/deposit.html', withdraw_requests=withdraw_requests, form_type="withdraw")
-    else:
-        return render_template('customer/deposit.html', msg="No withdraw requests found", form_type="withdraw")
+        if 'upi_id' in request.form:
+            upi_id = request.form['upi_id']
+            if account and 'upi_id' in account:
+                if check_password_hash(account['upi_id'], upi_id):
+                    # Increment the balance_checks field
+                    Account.increment_balance_checks(current_user)
+                    return jsonify({"balance": account['balance']}), 200
+                else:
+                    return jsonify({"msg": "UPI ID does not match"}), 400
+            else:
+                return redirect(url_for('customer.check_balance', action="create"))
+
+        elif 'new_upi_id' in request.form and 'reenter_upi_id' in request.form:
+            upi_id = request.form['new_upi_id']
+            reenter_upi_id = request.form['reenter_upi_id']
+            if upi_id == reenter_upi_id and len(upi_id) == 6 and upi_id.isdigit():
+                if Account.is_upi_id_taken(upi_id):
+                    return jsonify({"msg": "UPI ID is already registered"}), 400
+                hashed_upi_id = generate_password_hash(upi_id)
+                Account.update_account_upi_id(current_user, hashed_upi_id)
+                return jsonify({"msg": "UPI ID created successfully"}), 201
+            else:
+                return jsonify({"msg": "UPI ID does not match or is not valid"}), 400
+
+    
+    action = "check" if 'upi_id' in account else "create"
+    return render_template('customer/check_balance.html', action=action)
