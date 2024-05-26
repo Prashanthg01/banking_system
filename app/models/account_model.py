@@ -12,6 +12,11 @@ class Account:
     def get_account_by_number(account_number):
         accounts_collection = mongo.db.accounts
         return accounts_collection.find_one({"account_number": account_number})
+
+    @staticmethod
+    def get_account_by_form_id(form_id):
+        accounts_collection = mongo.db.accounts
+        return accounts_collection.find_one({"form_id": form_id})
     
     @staticmethod
     def update_account(account):
@@ -33,6 +38,14 @@ class DepositForm:
     def get_deposit_requests_by_user(user_id):
         return list(mongo.db.deposit_forms.find({"name": user_id}))
     
+    @staticmethod
+    def get_account_number_form_id(form_id):
+        deposit_request = mongo.db.deposit_forms.find_one({"form_id": form_id})
+        if deposit_request:
+            return deposit_request.get('account_number')
+        else:
+            return None
+        
     @staticmethod
     def get_deposit_request_status_by_account_number(account_num):
         deposit_request = mongo.db.deposit_forms.find_one({"account_number": account_num})
@@ -61,6 +74,14 @@ class withdrawForm:
         withdraw_request = mongo.db.withdraw_forms.find_one({"account_number": account_num})
         if withdraw_request:
             return withdraw_request.get('status')
+        else:
+            return None
+
+    @staticmethod
+    def get_account_number_form_id(form_id):
+        deposit_request = mongo.db.withdraw_forms.find_one({"form_id": form_id})
+        if deposit_request:
+            return deposit_request.get('account_number')
         else:
             return None
 

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>Dashboard</title>
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
 </head>
 
 <body>
@@ -16,7 +17,7 @@
     </form>
 
     <h1>My Account Details</h1>
-    <div>
+    <div class="my_account">
         {% if current_user_account_details %}
             <p>Name: {{ current_user_account_details.name }}</p>
             <p>Phone Number: {{ current_user_account_details.phone_number }}</p>
@@ -36,10 +37,10 @@
             <p>{{ msg }}</p>
         {% else %}
         {% for request in deposit_requests %}
-        <div>
+        <div {% if request.form_type == "deposit" %} class="deposite_cards" {% else %} class="withdraw_cards" {% endif %}>
             <p>Account number: {{ request.account_number }}</p>
             <p>Amount: {{ request.amount }}</p>
-            <p>{{ request.form_type }}: {{ request.status }}</p>
+            <p>{{ request.form_type }}: <span {% if request.status in ['accepted', 'success'] %} class="success" {% elif request.status == 'declined' %} class="decline" {% else %} class="pending" {% endif %}>{{ request.status }}</span></p>
         </div>
         {% endfor %}
         {% endif %}

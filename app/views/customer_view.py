@@ -17,7 +17,8 @@ def customer_dashboard():
     
     deposit_requests = DepositForm.get_deposit_requests_by_user(current_user)
     withdraw_requests = withdrawForm.get_withdraw_requests_by_user(current_user)
-    deposit_requests.append(withdraw_requests[0]) if withdraw_requests else deposit_requests
+
+    deposit_requests = deposit_requests + withdraw_requests if withdraw_requests else deposit_requests
     if access_token_cookie:
         if deposit_requests:
             return render_template('customer/dashboard.html', user_id=current_user, current_user_account_details=current_user_account_details, deposit_requests=deposit_requests)

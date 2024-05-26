@@ -1,8 +1,10 @@
 from flask import jsonify
 from app.models.account_model import DepositForm, withdrawForm
 from datetime import datetime
+from app.utils.customer_utils import generate_unique_id
 
 def deposit_amount(data):
+    unique_id = generate_unique_id()
     required_fields = ['name', 'account_number', 'amount', 'ifsc_code']
     for field in required_fields:
         if field not in data:
@@ -21,13 +23,15 @@ def deposit_amount(data):
         "status": "pending",
         "date": current_date,
         "time": current_time,
-        "form_type": "deposit"
+        "form_type": "deposit",
+        'form_id': unique_id
     }
 
     DepositForm.create_deposit_request(deposit_request)
     return jsonify({"msg": "Deposit request submitted successfully"}), 201
 
 def withdraw_amount(data):
+    unique_id = generate_unique_id()
     required_fields = ['name', 'account_number', 'amount', 'ifsc_code']
     for field in required_fields:
         if field not in data:
@@ -46,7 +50,8 @@ def withdraw_amount(data):
         "status": "pending",
         "date": current_date,
         "time": current_time,
-        "form_type": "withdraw"
+        "form_type": "withdraw",
+        'form_id': unique_id
     }
 
     withdrawForm.create_withdraw_request(withdraw_request)

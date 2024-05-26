@@ -1,0 +1,44 @@
+.my_account {
+    padding: 20px;
+    border-radius: 10px;
+    background: lightblue;
+    width: fit-content;
+}
+
+.deposite_cards {
+    padding: 20px;
+    border-radius: 10px;
+    background: lightgreen;
+    width: fit-content;
+    margin: 10px 5px;
+}
+
+.withdraw_cards {
+    padding: 20px;
+    border-radius: 10px;
+    background: #ffb6b6;
+    width: fit-content;
+    margin: 10px 5px;
+}
+
+
+.success {
+    background: green;
+  padding: 5px 10px;
+  border-radius: 10px;
+  color: #fff;
+}
+
+.decline {
+    background: red;
+  padding: 5px 10px;
+  border-radius: 10px;
+  color: #fff;
+}
+
+.pending {
+    background: gray;
+  padding: 5px 10px;
+  border-radius: 10px;
+  color: #fff;
+}

@@ -37,7 +37,7 @@
                 <td>{{ request.ifsc_code }}</td>
                 <td>
                     <form method="POST"
-                        action="{{ url_for('banker.update_deposit_status', request_account_num=request.account_number, request_amount=request.amount) }}">
+                        action="{{ url_for('banker.update_deposit_status', form_id=request.form_id, request_amount=request.amount) }}">
                         <select name="status">
                             <option value="pending" {% if request.status=='pending' %}selected{% endif %}>Pending
                             </option>
@@ -81,7 +81,7 @@
                 <td>{{ request.ifsc_code }}</td>
                 <td>
                     <form method="POST"
-                        action="{{ url_for('banker.update_withdraw_status', request_account_num=request.account_number, request_amount=request.amount) }}">
+                        action="{{ url_for('banker.update_withdraw_status', form_id=request.form_id, request_amount=request.amount) }}">
                         <select name="status">
                             <option value="pending" {% if request.status=='pending' %}selected{% endif %}>Pending
                             </option>
