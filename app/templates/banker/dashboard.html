@@ -8,6 +8,7 @@
 </head>
 
 <body>
+    <li><a href="{{ url_for('banker.register_account_view') }}">Register new account</a></li>
     {% if deposit_requests %}
     <table border="1">
         <thead>
@@ -28,15 +29,19 @@
                 <td>{{ request.amount }}</td>
                 <td>{{ request.ifsc_code }}</td>
                 <td>
-                    <form method="POST" action="{{ url_for('banker.update_status', request_account_num=request.account_number) }}">
+                    <form method="POST"
+                        action="{{ url_for('banker.update_status', request_account_num=request.account_number) }}">
                         <select name="status">
-                            <option value="pending" {% if request.status=='pending' %}selected{% endif %}>Pending</option>
-                            <option value="accepted" {% if request.status=='accepted' %}selected{% endif %}>Accepted</option>
-                            <option value="declined" {% if request.status=='declined' %}selected{% endif %}>Declined</option>
+                            <option value="pending" {% if request.status=='pending' %}selected{% endif %}>Pending
+                            </option>
+                            <option value="accepted" {% if request.status=='accepted' %}selected{% endif %}>Accepted
+                            </option>
+                            <option value="declined" {% if request.status=='declined' %}selected{% endif %}>Declined
+                            </option>
                         </select>
                         <button type="submit">Save</button>
                     </form>
-                    
+
                 </td>
             </tr>
             {% endfor %}
@@ -46,11 +51,26 @@
     <p>No deposit requests found.</p>
     {% endif %}
 
+    <div>
+        {% for account in all_accounts %}
+        <p>{{ account.name }}</p>
+        <p>{{ account.phone_number }}</p>
+        <p>{{ account.address }}</p>
+        <p>{{ account.account_number }}</p>
+        <p>{{ account.ifsc_code }}</p>
+        <p>{{ account.balance }}</p>
+        <form method="POST" action="{{ url_for('banker.delete_account', account_number=account.account_number) }}">
+            <button type="submit">Delete</button>
+        </form>
+        <a href="{{ url_for('banker.edit_account', account_number=account.account_number) }}">Edit</a>
+        {% endfor %}
+    </div>
+    
     <h1>Welcome to your Banker Dashboard, {{ user_id }}</h1>
     <form action="/auth/logout" method="post">
         <button type="submit">Logout</button>
     </form>
-    
+
 
 </body>
 

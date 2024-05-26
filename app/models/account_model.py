@@ -12,11 +12,15 @@ class Account:
     def get_account_by_number(account_number):
         accounts_collection = mongo.db.accounts
         return accounts_collection.find_one({"account_number": account_number})
-
+    
     @staticmethod
     def update_account(account):
         accounts_collection = mongo.db.accounts
         accounts_collection.update_one({"account_number": account['account_number']}, {"$set": account})
+
+    @staticmethod
+    def get_all_accounts():
+        return list(mongo.db.accounts.find())
 
 class DepositForm:
     @staticmethod
