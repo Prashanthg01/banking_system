@@ -8,7 +8,14 @@
 </head>
 
 <body>
-    <li><a href="{{ url_for('banker.register_account_view') }}">Register new account</a></li>
+    <h1>Welcome to your Banker Dashboard, {{ user_id }}</h1>
+    <form action="/auth/logout" method="post">
+        <button type="submit">Logout</button>
+    </form>
+
+    <button><a href="{{ url_for('banker.register_account_view') }}">Register new account</a></button>
+
+    <h1>Deposit Requests</h1>
     {% if deposit_requests %}
     <table border="1">
         <thead>
@@ -18,11 +25,11 @@
                 <th>Amount</th>
                 <th>IFSC Code</th>
                 <th>Status</th>
-                <th>Action</th>
             </tr>
         </thead>
         <tbody>
             {% for request in deposit_requests %}
+            {% if request.status=='pending' %}
             <tr>
                 <td>{{ request.name }}</td>
                 <td>{{ request.account_number }}</td>
@@ -30,7 +37,7 @@
                 <td>{{ request.ifsc_code }}</td>
                 <td>
                     <form method="POST"
-                        action="{{ url_for('banker.update_status', request_account_num=request.account_number, request_amount=request.amount) }}">
+                        action="{{ url_for('banker.update_deposit_status', request_account_num=request.account_number, request_amount=request.amount) }}">
                         <select name="status">
                             <option value="pending" {% if request.status=='pending' %}selected{% endif %}>Pending
                             </option>
@@ -44,6 +51,7 @@
 
                 </td>
             </tr>
+            {% endif %}
             {% endfor %}
         </tbody>
     </table>
@@ -51,26 +59,85 @@
     <p>No deposit requests found.</p>
     {% endif %}
 
-    <div>
-        {% for account in all_accounts %}
-        <p>{{ account.name }}</p>
-        <p>{{ account.phone_number }}</p>
-        <p>{{ account.address }}</p>
-        <p>{{ account.account_number }}</p>
-        <p>{{ account.ifsc_code }}</p>
-        <p>{{ account.balance }}</p>
-        <form method="POST" action="{{ url_for('banker.delete_account', account_number=account.account_number) }}">
-            <button type="submit">Delete</button>
-        </form>
-        <a href="{{ url_for('banker.edit_account', account_number=account.account_number) }}">Edit</a>
-        {% endfor %}
-    </div>
-    
-    <h1>Welcome to your Banker Dashboard, {{ user_id }}</h1>
-    <form action="/auth/logout" method="post">
-        <button type="submit">Logout</button>
-    </form>
+    <h1>Withdraw Requests</h1>
+    {% if withdraw_requests %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Account Number</th>
+                <th>Amount</th>
+                <th>IFSC Code</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in withdraw_requests %}
+            {% if request.status=='pending' %}
+            <tr>
+                <td>{{ request.name }}</td>
+                <td>{{ request.account_number }}</td>
+                <td>{{ request.amount }}</td>
+                <td>{{ request.ifsc_code }}</td>
+                <td>
+                    <form method="POST"
+                        action="{{ url_for('banker.update_withdraw_status', request_account_num=request.account_number, request_amount=request.amount) }}">
+                        <select name="status">
+                            <option value="pending" {% if request.status=='pending' %}selected{% endif %}>Pending
+                            </option>
+                            <option value="success" {% if request.status=='success' %}selected{% endif %}>Success
+                            </option>
+                            <option value="declined" {% if request.status=='declined' %}selected{% endif %}>Declined
+                            </option>
+                        </select>
+                        <button type="submit">Save</button>
+                    </form>
 
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No Withdraw requests found.</p>
+    {% endif %}
+
+
+    <h1>Registerd Accounts</h1>
+    <div>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone Number</th>
+                    <th>Address</th>
+                    <th>Account Number</th>
+                    <th>IFSC Code</th>
+                    <th>Balance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in all_accounts %}
+                <tr>
+                    <td>{{ account.name }}</td>
+                    <td>{{ account.phone_number }}</td>
+                    <td>{{ account.address }}</td>
+                    <td>{{ account.account_number }}</td>
+                    <td>{{ account.ifsc_code }}</td>
+                    <td>{{ account.balance }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('banker.delete_account', account_number=account.account_number) }}" style="display:inline;">
+                            <button type="submit">Delete</button>
+                        </form>
+                        <button><a href="{{ url_for('banker.edit_account', account_number=account.account_number) }}">Edit</a></button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>    
 
 </body>
 

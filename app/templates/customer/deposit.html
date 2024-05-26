@@ -8,7 +8,11 @@
 
 <body>
     <div>
+        {% if form_type == "deposit"%}
         <h1>Deposit Amount</h1>
+        {% else %}
+        <h1>Withdraw Amount</h1>
+        {% endif %}
         <form method="POST">
             <label for="name">Name:</label>
             <input type="text" id="name" name="name" required><br>
@@ -22,25 +26,12 @@
             <label for="ifsc_code">IFSC Code:</label>
             <input type="text" id="ifsc_code" name="ifsc_code" required><br>
 
+            {% if form_type == "deposit"%}
             <button type="submit">Deposit</button>
-        </form>
-    </div>
-    <div>
-        <h1>Check Deposit Status</h1>
-        <div>
-            {% if msg %}
-                <p>{{ msg }}</p>
             {% else %}
-            {% for request in deposit_requests %}
-            <div>
-                <p>{{ request.account_number }}</p>
-                <p>{{ request.ifsc_code }}</p>
-                <p>{{ request.amount }}</p>
-                <p>{{ request.status }}</p>
-            </div>
-            {% endfor %}
+            <button type="submit">Withdraw</button>
             {% endif %}
-        </div>
+        </form>
     </div>
 </body>
 

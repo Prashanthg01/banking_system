@@ -10,9 +10,40 @@
 <body>
     <h1>Welcome to your Customer Dashboard, {{ user_id }}</h1>
     <li><a href="{{ url_for('customer.deposit') }}">Deposit Request Form</a></li>
+    <li><a href="{{ url_for('customer.withdraw') }}">Withdraw Request Form</a></li>
     <form action="/auth/logout" method="post">
         <button type="submit">Logout</button>
     </form>
+
+    <h1>My Account Details</h1>
+    <div>
+        {% if current_user_account_details %}
+            <p>Name: {{ current_user_account_details.name }}</p>
+            <p>Phone Number: {{ current_user_account_details.phone_number }}</p>
+            <p>Address: {{ current_user_account_details.address }}</p>
+            <p>Gender: {{ current_user_account_details.gender }}</p>
+            <p>Account Number: {{ current_user_account_details.account_number }}</p>
+            <p>IFSC Code: {{ current_user_account_details.ifsc_code }}</p>
+            <p>Balance: {{ current_user_account_details.balance }}</p>
+        {% else %}
+            <p>No account details found</p>
+        {% endif %}
+    </div>  
+    
+    <h1>History</h1>
+    <div>
+        {% if msg %}
+            <p>{{ msg }}</p>
+        {% else %}
+        {% for request in deposit_requests %}
+        <div>
+            <p>Account number: {{ request.account_number }}</p>
+            <p>Amount: {{ request.amount }}</p>
+            <p>{{ request.form_type }}: {{ request.status }}</p>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
 </body>
 
 </html>
